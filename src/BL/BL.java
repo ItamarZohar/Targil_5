@@ -1,16 +1,15 @@
 package BL;
 
-import Data_Layer.Customer;
-import Data_Layer.Order;
-import Data_Layer.Product;
+import Data_Layer.*;
 import BL.*;
-import Data_Layer.ProductCategory;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
 import static Data_Layer.DataSource.*;
@@ -66,21 +65,25 @@ public class BL implements IBL {
 
     @Override
     public long numberOfProductInOrder(long orderId) {
-        //To do
-        return 0;
+        Stream<OrderProduct> stream = allOrderProducts.stream();
+        return stream.filter(e -> e.getOrderId()==orderId).collect(Collectors.toList()).size();
     }
 
     @Override
     public List<Product> getPopularOrderedProduct(int orderedtimes) {
-        //To do
-        return null;
+        Stream<Product> stream = allProducts.stream();
+        Function<Long,Integer> myOrder = e -> allOrderProducts.stream().filter(id -> id.getProductId()==e).collect(Collectors.toList()).size();
+        return stream.filter(e-> (myOrder.apply(e.getProductId()))>=orderedtimes).collect(Collectors.toList());
     }
 
     @Override
     public List<Product> getOrderProducts(long orderId)
     {
-        //To do
-        return null;
+       Stream<OrderProduct> myOrderP = allOrderProducts.stream().filter(i -> i.getOrderId()==orderId);
+        Stream<Product> myPstream = allProducts.stream();
+        return myPstream.filter(e -> myOrderP.anyMatch(i -> i.getProductId()==e.getProductId())).
+                sorted((e,i)-> Long.valueOf(e.getProductId()).compareTo(i.getProductId()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -90,10 +93,10 @@ public class BL implements IBL {
     }
 
     @Override
-    public Product getMaxOrderedProduct() {
-        //To do
-        return null;
-
+    public Product getMaxOrderedProduct() {  //////////*********************************************
+       Stream<Product> stream = allProducts.stream();
+        Function<Long ,Integer> myOrdersP = (e)-> allOrderProducts.stream().filter(id -> id.getProductId()==e).collect(Collectors.toList()).size();
+        return stream.max((Comparator<? super Product>) myOrdersP).orElse(null);
     }
     @Override
     public double sumOfOrder(long orderID) {
@@ -103,13 +106,20 @@ public class BL implements IBL {
 
     @Override
     public List<Order> getExpensiveOrders(double price) {
-        //To do
+        Stream<Order> stream = allOrders.stream();
+
+
+
+
         return null;
     }
 
     @Override
     public List<Customer> ThreeTierCustomerWithMaxOrders() {
-        //To do
+        Function<Long ,List<Order>> myOrders = (e)-> allOrders.stream().filter(id -> id.getCustomrId()==e).collect(Collectors.toList());
+        // num of order for cumtmaor
+
+
         return null;
 
     }
