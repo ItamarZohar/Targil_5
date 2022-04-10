@@ -9,8 +9,11 @@ import Data_Layer.ProductCategory;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static Data_Layer.DataSource.*;
 import static java.util.Collections.reverseOrder;
 import static java.util.Map.Entry.comparingByValue;
 import static java.util.function.UnaryOperator.identity;
@@ -19,39 +22,46 @@ import static java.util.stream.Collectors.*;
 public class BL implements IBL {
     @Override
     public Product getProductById(long productId) {
-        //To do
-        return null;
+        Stream<Product> stream = allProducts.stream();
+        return stream.filter(e-> e.getProductId()==productId).collect(Collectors.toList()).get(0);
     }
 
     @Override
     public Order getOrderById(long orderId) {
-        //To do
-        return null;
+        Stream<Order> stream = allOrders.stream();
+        return stream.filter(e-> e.getOrderId()==orderId).collect(Collectors.toList()).get(0);
     }
 
     @Override
     public Customer getCustomerById(long customerId) {
-        //To do
-        return null;
+        Stream<Customer> stream = allCustomers.stream();
+        return stream.filter(e-> e.getId()==customerId).collect(Collectors.toList()).get(0);
     }
 
 
     @Override
     public List<Product> getProducts(ProductCategory cat, double price) {
-        //To do
-        return null;
+        Stream<Product> stream = allProducts.stream();
+        return stream.filter(e -> e.getCategory()==cat&&e.getPrice()<=price).
+                sorted((e,i)-> Long.valueOf(e.getProductId()).compareTo(i.getProductId()))
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<Customer> popularCustomers() {
-        //To do
-        return null;
+        Stream<Customer> stream = allCustomers.stream();
+        Function<Long ,List<Order>> myOrders = (e)-> allOrders.stream().filter(id -> id.getCustomrId()==e).collect(Collectors.toList());
+        return stream.filter(e -> e.getTier()==3&& myOrders.apply(e.getId()).size()>=10).
+                sorted((e,i)-> Long.valueOf(e.getId()).compareTo(i.getId()))
+                .collect(Collectors.toList());
+
     }
 
     @Override
     public List<Order> getCustomerOrders(long customerId) {
-        //To do
-        return null;
+        Function<Long ,List<Order>> myOrders = (e)-> allOrders.stream().filter(id -> id.getCustomrId()==e).collect(Collectors.toList());
+        return myOrders.apply(customerId).stream().sorted((e,i)-> Long.valueOf(e.getOrderId()).compareTo(i.getOrderId()))
+                .collect(Collectors.toList());
     }
 
     @Override

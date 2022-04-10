@@ -2,6 +2,7 @@ package Data_Layer;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.Long.parseLong;
 import static java.util.Arrays.stream;
@@ -18,20 +19,11 @@ public class Product
         List<String> myData=stream(orderInfo.split(" ")).collect(Collectors.toList());
         ProductId = Long.valueOf(myData.get((1)));
         name = myData.get(2);
-        category = ReturnTheCategory(myData.get(4));
+        Stream<ProductCategory> stream = stream(ProductCategory.values());
+        category= stream.filter(i -> i.toString()==myData.get(4)).collect(Collectors.toList()).get(0);
         price = Double.valueOf(myData.get(6));
     }
-    private ProductCategory ReturnTheCategory(String myCategory )
-    {
-        for (ProductCategory i  : ProductCategory.values() )
-        {
-            if(i.toString()== myCategory)
-            {
-                return i;
-            }
-        }
-        return null;
-    }
+
 
     public Product(long PId, String Pname, ProductCategory Pcategory, double Pprice)
     {
