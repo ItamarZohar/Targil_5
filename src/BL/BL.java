@@ -3,6 +3,7 @@ package BL;
 import Data_Layer.*;
 import BL.*;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -88,16 +89,29 @@ public class BL implements IBL {
 
     @Override
     public List<Customer> getCustomersWhoOrderedProduct(long productId) {
-        //To do
-        return null;
+        Stream<Customer> C = allCustomers.stream();
+
+       return C.filter(i-> getCustomerOrders(i.getId()).stream().
+                filter(j-> getOrderProducts(j.getOrderId()).stream().anyMatch(k->k.getProductId()==productId))
+                .anyMatch(e->e!=null)).collect(Collectors.toList());
+
+
+        // מעבר על ההזמנות של הלקוח
+        // כל הזמנה נקבל מוצרים
+        // אם במוצרים אלו קיים המוצר אז מצוין
+
+
     }
 
     @Override
-    public Product getMaxOrderedProduct() {  //////////*********************************************
+    public Product getMaxOrderedProduct() {
        Stream<Product> stream = allProducts.stream();
-        Function<Long ,Integer> myOrdersP = (e)-> allOrderProducts.stream().filter(id -> id.getProductId()==e).collect(Collectors.toList()).size();
-        return stream.max((Comparator<? super Product>) myOrdersP).orElse(null);
+        Function<Double ,Integer> myOrdersP = (e)-> allOrderProducts.stream().filter(id -> id.getProductId()==e).collect(Collectors.toList()).size();
+        return stream.max((x,y)-> myOrdersP.apply(x.getPrice())-myOrdersP.apply(y.getPrice())).orElse(null);
     }
+
+
+
     @Override
     public double sumOfOrder(long orderID) {
         //To do
@@ -116,12 +130,11 @@ public class BL implements IBL {
 
     @Override
     public List<Customer> ThreeTierCustomerWithMaxOrders() {
-        Function<Long ,List<Order>> myOrders = (e)-> allOrders.stream().filter(id -> id.getCustomrId()==e).collect(Collectors.toList());
-        // num of order for cumtmaor
-
-
-        return null;
-
+        Function<Long ,Integer> myOrders = (e)-> allOrders.stream().filter(id -> id.getCustomrId()==e).collect(Collectors.toList()).size();
+        //num of order for the customer
+        Stream<Customer> stream = allCustomers.stream();
+        return stream.filter(e->e.getTier()==3).sorted((x,y)-> myOrders.apply(x.getId())-myOrders.apply(y.getId())).
+                sorted(Collections.reverseOrder()).limit(3).collect(Collectors.toList());
     }
 
 }
