@@ -15,13 +15,26 @@ public class Order {
     private Date orderDate;
     private Date deliveryDate;
     private OrderStatus status;
-
     private long customrId;
 
-    public Order(String orderInfo)  {
+    public Order(String orderInfo) throws ParseException {
         List<String> myData=stream(orderInfo.split(" ")).collect(Collectors.toList());
-        orderId=Integer.valueOf(myData.get(1));
-        
+        orderId=Long.valueOf(myData.get(1));
+        orderDate= new SimpleDateFormat("dd/MM/yyyy").parse(myData.get(4));
+        deliveryDate = new SimpleDateFormat("dd/MM/yyyy").parse(myData.get(7));
+        status = ReturnTheStatus(myData.get(9));
+        customrId=Long.valueOf(myData.get(12));
+    }
+    private OrderStatus ReturnTheStatus(String myStatus)
+    {
+      for (OrderStatus i  : OrderStatus.values() )
+      {
+          if(i.toString()== myStatus)
+          {
+              return i;
+          }
+      }
+      return null;
     }
 
     public Order(long Oid, Date OorderDate, Date OdeliveryDate, OrderStatus Ostatus, long OcustomrId)

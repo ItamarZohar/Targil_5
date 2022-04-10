@@ -1,6 +1,10 @@
 package Data_Layer;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static java.lang.Long.parseLong;
+import static java.util.Arrays.stream;
 
 public class OrderProduct {
     private long orderId;
@@ -9,7 +13,10 @@ public class OrderProduct {
 
     public OrderProduct(String orderInfo)
     {
-        //To Do
+        List<String> myData=stream(orderInfo.split(" ")).collect(Collectors.toList());
+        orderId = Long.valueOf(myData.get(2));
+        productId = Long.valueOf(myData.get(5));
+        quantity = Integer.valueOf(myData.get(7));
     }
 
     public OrderProduct(long oId, long pId, int quantity)

@@ -16,7 +16,7 @@ public class Customer {
  public Customer(String customerInfo)
  {
   List<String> myData=stream(customerInfo.split(" ")).collect(Collectors.toList());
-   id= Integer.valueOf(myData.get(1));
+   id= Long.valueOf(myData.get(1));
    name = myData.get(3);
    tier =Integer.valueOf(myData.get(5));
 
