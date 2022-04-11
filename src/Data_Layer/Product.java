@@ -17,11 +17,11 @@ public class Product
     public Product(String orderInfo)
     {
         List<String> myData=stream(orderInfo.split(" ")).collect(Collectors.toList());
-        ProductId = Long.valueOf(myData.get((1)));
+        ProductId = Long.parseLong(myData.get((1)));
         name = myData.get(2);
         Stream<ProductCategory> stream = stream(ProductCategory.values());
-        category= stream.filter(i -> i.toString()==myData.get(4)).collect(Collectors.toList()).get(0);
-        price = Double.valueOf(myData.get(6));
+        category= ProductCategory.valueOf(myData.get(4));
+        price = Double.parseDouble(myData.get(6));
     }
 
 

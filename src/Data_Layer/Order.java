@@ -19,13 +19,14 @@ public class Order {
     private long customrId;
 
     public Order(String orderInfo) throws ParseException {
-        List<String> myData=stream(orderInfo.split(" ")).collect(Collectors.toList());
-        orderId=Long.valueOf(myData.get(1));
-        orderDate= new SimpleDateFormat("dd/MM/yyyy").parse(myData.get(4));
-        deliveryDate = new SimpleDateFormat("dd/MM/yyyy").parse(myData.get(7));
-        Stream<OrderStatus> stream = stream(OrderStatus.values());
-        status= stream.filter(i -> i.toString()==myData.get(9)).collect(Collectors.toList()).get(0);
-        customrId=Long.valueOf(myData.get(12));
+
+            List<String> myData = stream(orderInfo.split(" ")).collect(Collectors.toList());
+            orderId = Long.parseLong(myData.get(1));
+            orderDate = new SimpleDateFormat("dd/MM/yyyy").parse(myData.get(4));
+            deliveryDate = new SimpleDateFormat("dd/MM/yyyy").parse(myData.get(7));
+            status = OrderStatus.valueOf(myData.get(9));
+            customrId = Long.parseLong(myData.get(12));
+
     }
 
 

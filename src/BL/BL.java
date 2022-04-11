@@ -3,10 +3,8 @@ package BL;
 import Data_Layer.*;
 import BL.*;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -18,6 +16,7 @@ import static java.util.Collections.reverseOrder;
 import static java.util.Map.Entry.comparingByValue;
 import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.*;
+
 
 public class BL implements IBL {
     @Override
@@ -80,11 +79,12 @@ public class BL implements IBL {
     @Override
     public List<Product> getOrderProducts(long orderId)
     {
-       Stream<OrderProduct> myOrderP = allOrderProducts.stream().filter(i -> i.getOrderId()==orderId);
-        Stream<Product> myPstream = allProducts.stream();
-        return myPstream.filter(e -> myOrderP.anyMatch(i -> i.getProductId()==e.getProductId())).
-                sorted((e,i)-> Long.valueOf(e.getProductId()).compareTo(i.getProductId()))
-                .collect(Collectors.toList());
+    // Stream<OrderProduct> myOP = allOrderProducts.stream();
+    // Predicate<Product> P = i-> myOP.filter(o->o.getOrderId()==orderId).anyMatch(j-> j.getProductId()==i.getProductId());
+     Stream<Product> myP = allProducts.stream();
+     //return myP.filter(P).collect(Collectors.toList());
+
+     return myP.filter(i-> allOrderProducts.stream().filter(o->o.getOrderId()==orderId).anyMatch(j-> j.getProductId()==i.getProductId())).collect(Collectors.toList());
     }
 
     @Override
@@ -114,18 +114,21 @@ public class BL implements IBL {
 
     @Override
     public double sumOfOrder(long orderID) {
-        //To do
-        return 0;
+        Stream<Order> stream = allOrders.stream();
+        return getOrderProducts(orderID).stream().map(x -> x.getPrice()).reduce((x, y) -> x + y).stream().collect(Collectors.toList()).get(0);
     }
 
     @Override
     public List<Order> getExpensiveOrders(double price) {
         Stream<Order> stream = allOrders.stream();
 
-
-
-
-        return null;
+      //  stream.filter(i-> getOrderProducts(i.getOrderId()).stream().map(j->j.getPrice())
+       //         .reduce((x,y)->x+y).stream().collect(Collectors.toList()).get(0)>0;
+       Predicate<Long> Pi = i -> sumOfOrder(i)>price;
+        return stream.filter(i -> Pi.test(i.getOrderId())).collect(Collectors.toList());
+        //קבלת כל ההזמנות
+        //עבור כל הזמנה נקבל את כל המוצרים שלה
+        // נסכום את עלות המוצרים ואם גדול מהפרמטר נסנן לפי זה
     }
 
     @Override
@@ -133,8 +136,8 @@ public class BL implements IBL {
         Function<Long ,Integer> myOrders = (e)-> allOrders.stream().filter(id -> id.getCustomrId()==e).collect(Collectors.toList()).size();
         //num of order for the customer
         Stream<Customer> stream = allCustomers.stream();
-        return stream.filter(e->e.getTier()==3).sorted((x,y)-> myOrders.apply(x.getId())-myOrders.apply(y.getId())).
-                sorted(Collections.reverseOrder()).limit(3).collect(Collectors.toList());
+        return stream.filter(e->e.getTier()==3).sorted((x,y)-> myOrders.apply(x.getId())-myOrders.apply(y.getId()))
+               /* sorted(Collections.reverseOrder())*/.limit(3).collect(Collectors.toList());
     }
 
 }
